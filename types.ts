@@ -31,6 +31,7 @@ export interface GameQuestion {
   starter: string;
   answers: CompletionAnswer[];
   sources?: SourceLink[];
+  timestamp?: number;
 }
 
 export interface GameState {
@@ -43,4 +44,11 @@ export interface GameState {
   mode: GameMode | null;
   lastGuessCorrect: boolean | null;
   funnyResponse: string;
+}
+
+export interface AdminStats {
+  totalQuestionsGenerated: number;
+  averageAiResponseTime: number;
+  systemHealth: 'stable' | 'warning' | 'error';
+  recentQuestions: GameQuestion[];
 }
