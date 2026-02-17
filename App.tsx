@@ -40,6 +40,14 @@ const getEditDistance = (a: string, b: string): number => {
   return matrix[b.length][a.length];
 };
 
+const LOADING_MESSAGES = [
+  "جاري جلب آخر الهبّات...",
+  "نشوف الناس وش يبحثون عنه...",
+  "لحظة، الذكاء الاصطناعي قاعد يتقهوى...",
+  "نجهز لك سؤال يخليك تحك راسك...",
+  "اتصال بسيرفرات جوجل القادحة..."
+];
+
 const App: React.FC = () => {
   const [state, setState] = useState<GameState>({
     currentQuestion: null,
@@ -59,6 +67,7 @@ const App: React.FC = () => {
   const [passcodeError, setPasscodeError] = useState(false);
   const [siteAnnouncement, setSiteAnnouncement] = useState('🔥 العب الآن وجرب حظك في توقع البحث السعودي!');
   const [isUpdatingCloud, setIsUpdatingCloud] = useState(false);
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   
   const [adminStats, setAdminStats] = useState<AdminStats>({
     totalQuestionsGenerated: 0,
@@ -76,6 +85,16 @@ const App: React.FC = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    let interval: number;
+    if (state.status === 'loading') {
+      interval = window.setInterval(() => {
+        setLoadingMsgIdx(prev => (prev + 1) % LOADING_MESSAGES.length);
+      }, 2500);
+    }
+    return () => clearInterval(interval);
+  }, [state.status]);
 
   const handleAdminAccess = () => {
     setShowPasscode(true);
@@ -221,8 +240,11 @@ const App: React.FC = () => {
         )}
         {state.status === 'loading' && (
           <div className="flex flex-col items-center justify-center py-24 space-y-6">
-            <div className="relative"><div className="w-20 h-20 border-4 border-slate-800 rounded-full"></div><div className="w-20 h-20 border-4 border-green-500 border-t-transparent rounded-full animate-spin absolute top-0"></div></div>
-            <p className="text-2xl font-black animate-pulse">جاري تحضير الاسئله القادحه...</p>
+            <div className="relative">
+              <div className="w-20 h-20 border-4 border-slate-800 rounded-full"></div>
+              <div className="w-20 h-20 border-4 border-green-500 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+            </div>
+            <p className="text-2xl font-black animate-pulse text-center max-w-xs">{LOADING_MESSAGES[loadingMsgIdx]}</p>
           </div>
         )}
         {state.status === 'playing' && (
